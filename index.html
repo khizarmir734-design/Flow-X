@@ -1,0 +1,36 @@
+ html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowX Terminal</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+body{background:#0a0e17;color:white;font-family:sans-serif;margin:0;padding:10px}
+.top{display:flex;justify-content:space-between;align-items:center}
+#price{font-size:26px;font-weight:bold;color:#00ff88}
+#chart{height:380px;width:100%;margin-top:10px}
+.box{background:#131a2a;padding:12px;border-radius:10px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="top"><div><b>BTC/USDT</b><br><span style="font-size:12px;color:#888">FlowX Terminal</span></div><div id="price">Loading...</div></div>
+<div id="chart"></div>
+<div class="box">VWAP: <span id="vwap" style="color:#ffcc00">Loading...</span><br><span style="font-size:12px;color:#888">Yellow Line = VWAP</span></div>
+<div class="box"><b>DELTA - Buyers vs Sellers</b><div style="display:flex;height:22px;border-radius:10px;overflow:hidden;margin-top:8px"><div id="buyBar" style="background:#00ff88;width:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:black;font-weight:bold">Buy 50%</div><div id="sellBar" style="background:#ff3b3b;width:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:bold">Sell 50%</div></div><div id="deltaText" style="font-size:12px;color:#888;margin-top:5px">Calculating Delta...</div></div>
+<script>
+const chart = LightweightCharts.createChart(document.getElementById('chart'),{layout:{background:{color:'#0a0e17'},textColor:'#fff'},grid:{vertLines:{color:'#1a2333'},horzLines:{color:'#1a2333'}},width:window.innerWidth-20,height:380});
+const candleSeries = chart.addCandlestickSeries({upColor:'#00ff88',downColor:'#ff3b3b',wickUpColor:'#00ff88',wickDownColor:'#ff3b3b'});
+const vwapSeries = chart.addLineSeries({color:'#ffcc00',lineWidth:2});
+let vwapData=[]; let cumPV=0, cumVol=0;
+fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=100').then(r=>r.json()).then(data=>{
+let candles=data.map(d=>({time:Math.floor(d[0]/1000),open:parseFloat(d[1]),high:parseFloat(d[2]),low:parseFloat(d[3]),close:parseFloat(d[4])}));
+candleSeries.setData(candles);
+data.forEach(d=>{let typical=(parseFloat(d[2])+parseFloat(d[3])+parseFloat(d[4]))/3;let vol=parseFloat(d[5]);cumPV+=typical*vol;cumVol+=vol;vwapData.push({time:Math.floor(d[0]/1000),value:cumPV/cumVol});});
+vwapSeries.setData(vwapData);
+document.getElementById('vwap').innerText='$'+vwapData[vwapData.length-1].value.toFixed(2);
+});
+setInterval(()=>{fetch('https://fapi.binance.com/fapi/v1/ticker/price?symbol=BTCUSDT').then(r=>r.json()).then(d=>{document.getElementById('price').innerText='$'+parseFloat(d.price).toLocaleString();});},2000);
+setInterval(()=>{fetch('https://fapi.binance.com/fapi/v1/aggTrades?symbol=BTCUSDT&limit=100').then(r=>r.json()).then(trades=>{let buyVol=0,sellVol=0;trades.forEach(t=>{let qty=parseFloat(t.q);if(t.m){sellVol+=qty;}else{buyVol+=qty;}});let total=buyVol+sellVol;let buyPct=Math.round((buyVol/total)*100);let sellPct=100-buyPct;document.getElementById('buyBar').style.width=buyPct+'%';document.getElementById('buyBar').innerText='Buy '+buyPct+'%';document.getElementById('sellBar').style.width=sellPct+'%';document.getElementById('sellBar').innerText='Sell '+sellPct+'%';let delta=buyVol-sellVol;document.getElementById('deltaText').innerText='Delta: '+delta.toFixed(2)+' BTC | '+(delta>0?'Buyers Strong':'Sellers Strong');});},3000);
+</script>
+</body>
+</html>
