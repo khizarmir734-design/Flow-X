@@ -3,19 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>FLOW-X PRO</title>
+<title>FLOW-X PRO V4</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#0a0a0a;color:#fff;overflow-x:hidden}
-.top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #222;background:#111}
+.top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#111;border-bottom:1px solid #222}
 .left{display:flex;align-items:center;gap:8px}
 .btc{width:36px;height:36px;background:#f7931a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900}
 .avg{text-align:center}.avg small{color:#888;font-size:10px;letter-spacing:2px}.avg div{font-size:24px;font-weight:800}
 .bar{display:flex;gap:6px;padding:8px;overflow-x:auto;white-space:nowrap}
 .pill{background:#1a1a1a;border:1px solid #333;padding:8px 11px;border-radius:8px;font-size:12px;font-weight:700}
-.tfBar{display:flex;gap:6px;padding:0 10px 8px;overflow-x:auto}
+.tfBar{display:flex;gap:6px;padding:0 10px 8px;overflow-x:auto;align-items:center}
 .tf{background:#1c1c1c;border:1px solid #333;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700}
 .tf.active{background:#fff;color:#000}
+.zoomBtn{background:#f7931a;color:#000;border:none;padding:6px 12px;border-radius:20px;font-weight:900;font-size:14px}
 .main{display:flex;margin:0 10px;background:#000;border:1px solid #222;border-radius:8px;overflow:hidden}
 .tools{width:48px;background:#111;border-right:1px solid #222;display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:4px}
 .tbtn{width:38px;height:38px;background:transparent;border:1px solid transparent;border-radius:8px;color:#ccc;font-size:18px;display:flex;align-items:center;justify-content:center}
@@ -23,44 +24,59 @@ body{background:#0a0a0a;color:#fff;overflow-x:hidden}
 .chartWrap{flex:1;position:relative;min-width:0}
 .info{font-size:11px;color:#aaa;padding:6px;display:flex;flex-wrap:wrap;gap:8px}
 .red{color:#ff4d4d}.green{color:#2ebd85}
-canvas{width:100%;height:340px;display:block;touch-action:none}
-.priceTag{position:absolute;right:0;top:180px;background:#ff3b30;padding:4px 7px;border-radius:3px;font-weight:800;font-size:13px}
+canvas{width:100%;height:300px;display:block;touch-action:none}
+#cvdCanvas{height:70px;border-top:1px dashed #333}
+.priceTag{position:absolute;right:0;top:140px;background:#ff3b30;padding:4px 7px;border-radius:3px;font-weight:800;font-size:13px}
 .hint{text-align:center;font-size:11px;color:#888;padding:5px}
-.cols{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid #222}
-.col{border-right:1px solid #222;padding:8px 5px}.col:last-child{border:none}
+.zoomBar{display:flex;gap:8px;justify-content:center;padding:6px}
+.zb{background:#1c1c1c;border:1px solid #333;color:#fff;padding:7px 14px;border-radius:8px;font-weight:800}
+.tradesHead{display:flex;justify-content:space-between;padding:12px;align-items:center}
+.cols{display:flex;overflow-x:auto;border-top:1px solid #222}
+.col{min-width:150px;border-right:1px solid #222;padding:8px 5px;flex:1}
 .colHead{font-size:10px;color:#888;margin-bottom:6px}.colHead b{color:#fff;font-size:12px}
 .row{display:flex;align-items:center;gap:5px;padding:6px 0;border-bottom:1px solid #111;font-size:12px}
 .dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px}
 .binance{background:#f0b90b;color:#000}.okx{background:#000;color:#fff;border:1px solid #333}.bybit{background:#f7a600;color:#000}.coinbase{background:#0052ff}.kraken{background:#5741d9}.kucoin{background:#24ae8f}.bitget{background:#00f0ff;color:#000}
 .amt{margin-left:auto;color:#888;font-size:11px}
+.recent{margin:10px;background:#111;border:1px solid #222;border-radius:8px;padding:10px}
+.recent b{letter-spacing:2px;color:#f7931a}
+.recRow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222;font-size:12px}
 .clearBtn{width:calc(100% - 20px);background:#ff3b30;border:none;color:#fff;padding:8px;border-radius:6px;font-weight:800;margin:8px 10px}
 </style>
 </head>
 <body>
-<div class="top"><div class="left"><div class="btc">₿</div><b>BTC</b></div><div class="avg"><small>AVERAGE PRICE</small><div id="avgPrice">59,541.2</div></div><div style="font-size:20px">⚙️</div></div>
+<div class="top"><div class="left"><div class="btc">₿</div><b>BTC</b></div><div class="avg"><small>AVERAGE PRICE</small><div id="avgPrice">59,272.2</div></div><div style="font-size:20px">⚙️</div></div>
 <div class="bar"><span class="pill">BTCUSDT</span><span class="pill">4H ▼</span><span class="pill">AUTO</span><span class="pill">LOG</span><span class="pill">⇅ FLIP</span><span class="pill">☰</span></div>
-<div class="tfBar" id="tfBar"><button class="tf" onclick="setTF(this,'1m')">1m</button><button class="tf" onclick="setTF(this,'5m')">5m</button><button class="tf" onclick="setTF(this,'15m')">15m</button><button class="tf" onclick="setTF(this,'1H')">1H</button><button class="tf active" onclick="setTF(this,'4H')">4H</button><button class="tf" onclick="setTF(this,'1D')">1D</button><button class="tf" onclick="setTF(this,'1W')">1W</button></div>
-<div class="main"><div class="tools"><button class="tbtn active" onclick="setTool(this,'cursor')">↖️</button><button class="tbtn" onclick="setTool(this,'line')">╱</button><button class="tbtn" onclick="setTool(this,'hline')">—</button><button class="tbtn" onclick="setTool(this,'rect')">▭</button><button class="tbtn" onclick="setTool(this,'fib')">〰️</button><button class="tbtn" onclick="setTool(this,'text')">T</button><button class="tbtn" onclick="clearDraw()">🧹</button></div><div class="chartWrap"><div class="info"><span>O <span id="oP">59,692.8</span></span><span>H <span id="hP">59,843.7</span></span><span>L <span id="lP">59,302.5</span></span><span>C <span id="cP">59,541.6</span></span><span class="red">-0.25%</span><span>Vol <span class="red">-29.11M</span></span><span>VWAP 72,544.3</span></div><canvas id="chart"></canvas><div class="priceTag" id="priceTag">59541.6</div></div></div>
-<div class="hint" id="hint">👆 Tool select karo, phir chart pe ungli se line khencho</div>
+<div class="tfBar"><button class="tf" onclick="setTF(this,'1m')">1m</button><button class="tf" onclick="setTF(this,'5m')">5m</button><button class="tf" onclick="setTF(this,'15m')">15m</button><button class="tf" onclick="setTF(this,'1H')">1H</button><button class="tf active" onclick="setTF(this,'4H')">4H</button><button class="tf" onclick="setTF(this,'1D')">1D</button><button class="tf" onclick="setTF(this,'1W')">1W</button><button class="zoomBtn" onclick="zoomOut()">- ZOOM OUT</button><button class="zoomBtn" onclick="zoomIn()">+ ZOOM IN</button></div>
+<div class="main"><div class="tools"><button class="tbtn active" onclick="setTool(this,'cursor')">↖️</button><button class="tbtn" onclick="setTool(this,'line')">╱</button><button class="tbtn" onclick="setTool(this,'hline')">—</button><button class="tbtn" onclick="setTool(this,'rect')">▭</button><button class="tbtn" onclick="setTool(this,'fib')">〰️</button><button class="tbtn" onclick="setTool(this,'text')">T</button><button class="tbtn" onclick="clearDraw()">🧹</button></div><div class="chartWrap"><div class="info"><span>O <span id="oP">59,798.9</span></span><span>H <span id="hP">59,805.0</span></span><span>L <span id="lP">58,923.6</span></span><span>C <span id="cP">59,272.2</span></span><span class="red" id="chg">-526.70 (-0.88%)</span><span>Vol <span class="red" id="vol">-192.18M</span></span><br><span>VWAP <span id="vwap">72,535.0</span></span><span>Spot CVD <span class="green" id="spotCVD">+0.55</span></span><span>Perp CVD <span class="red" id="perpCVD">-4.56</span></span><span>Perps Long <span class="green" id="longVol">$1.2M</span></span></div><canvas id="chart"></canvas><canvas id="cvdCanvas"></canvas><div class="priceTag" id="priceTag">59272.2</div></div></div>
+<div class="zoomBar"><button class="zb" onclick="zoomOut()">🔍 - Zoom Out</button><button class="zb" onclick="zoomIn()">🔍 + Zoom In</button><button class="zb" onclick="resetZoom()">↺ Reset</button><span class="zb" id="zoomLabel">Candles: 45</span></div>
+<div class="hint" id="hint">👆 Tool select karo, chart pe line khencho | Zoom se chart chota-bara karo</div>
 <button class="clearBtn" onclick="clearDraw()">🧹 Sari Drawing Mitao</button>
-<div style="display:flex;justify-content:space-between;padding:12px"><b style="letter-spacing:3px">TRADES</b><small style="color:#888">QUAD / MIN $2.0K</small></div>
-<div class="cols"><div class="col"><div class="colHead">PERPS LONG<br><b>$725K 3M</b></div><div id="longCol"></div></div><div class="col"><div class="colHead">PERPS SHORT<br><b>$3.65M 3M</b></div><div id="shortCol"></div></div><div class="col"><div class="colHead">SPOT BUY<br><b>$297K 3M</b></div><div id="spotCol"></div></div></div>
+<div class="tradesHead"><b style="letter-spacing:3px">TRADES</b><small style="color:#888">QUAD / MIN $2.0K</small><span>☰</span></div>
+<div class="cols"><div class="col"><div class="colHead">PERPS LONG<br><b id="plVol">$1.2M 3M</b></div><div id="longCol"></div></div><div class="col"><div class="colHead">PERPS SHORT<br><b id="psVol">$1.94M 3M</b></div><div id="shortCol"></div></div><div class="col"><div class="colHead">SPOT BUY<br><b id="sbVol">$480K 3M</b></div><div id="buyCol"></div></div><div class="col"><div class="colHead">SPOT SELL<br><b id="ssVol">$163K 3M</b></div><div id="sellCol"></div></div></div>
+<div class="recent"><b>🕒 RECENT TRADES - LIVE</b><div id="recentList"></div></div>
 <script>
-let price=59541.2,tool='cursor',drawings=[],start=null,candles=[];
+let price=59272.2,tool='cursor',drawings=[],start=null,candles=[],candleCount=45,spotCVD=0.55,perpCVD=-4.56,spotHist=[],perpHist=[];
 const ex=[['B','binance'],['O','okx'],['Y','bybit'],['C','coinbase'],['K','kraken'],['K','kucoin'],['B','bitget']];
-function setTF(el,tf){document.querySelectorAll('.tf').forEach(b=>b.classList.remove('active'));el.classList.add('active');genCandles();draw();document.getElementById('hint').textContent='Timeframe: '+tf+' - Update ho gaya ✅';}
+function setTF(el,tf){document.querySelectorAll('.tf').forEach(b=>b.classList.remove('active'));el.classList.add('active');genCandles();draw();document.getElementById('hint').textContent='Timeframe: '+tf+' ✅';}
 function setTool(el,t){document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');tool=t;}
 function clearDraw(){drawings=[];draw();}
-function genCandles(){candles=[];let b=price;for(let i=0;i<45;i++){let o=b;let c=o+(Math.random()*500-250);let h=Math.max(o,c)+Math.random()*200;let l=Math.min(o,c)-Math.random()*200;candles.push({o,c,h,l});b=c;}}
+function zoomIn(){if(candleCount>15){candleCount-=10;document.getElementById('zoomLabel').textContent='Candles: '+candleCount;genCandles();draw();}}
+function zoomOut(){if(candleCount<90){candleCount+=10;document.getElementById('zoomLabel').textContent='Candles: '+candleCount;genCandles();draw();}}
+function resetZoom(){candleCount=45;document.getElementById('zoomLabel').textContent='Candles: 45';genCandles();draw();}
+function genCandles(){candles=[];let b=price;for(let i=0;i<candleCount;i++){let o=b;let c=o+(Math.random()*500-250);let h=Math.max(o,c)+Math.random()*200;let l=Math.min(o,c)-Math.random()*200;candles.push({o,c,h,l});b=c;}if(candles.length){let last=candles[candles.length-1];document.getElementById('oP').textContent=last.o.toFixed(1);document.getElementById('hP').textContent=last.h.toFixed(1);document.getElementById('lP').textContent=last.l.toFixed(1);document.getElementById('cP').textContent=last.c.toFixed(1);}}
 genCandles();
-function draw(){const cv=document.getElementById('chart');const x=cv.getContext('2d');let w=cv.offsetWidth,h=340;cv.width=w*2;cv.height=h*2;x.scale(2,2);x.clearRect(0,0,w,h);let all=candles.flatMap(c=>[c.h,c.l]);let max=Math.max(...all),min=Math.min(...all);let Y=v=>20+(max-v)/(max-min)*(h-50);for(let i=0;i<candles.length;i++){let c=candles[i];let px=10+i*((w-30)/candles.length);let cw=(w-30)/candles.length*0.6;x.strokeStyle='#888';x.beginPath();x.moveTo(px+cw/2,Y(c.h));x.lineTo(px+cw/2,Y(c.l));x.stroke();x.fillStyle=c.c>=c.o?'#2ebd85':'#ff4d4d';x.fillRect(px,Y(Math.max(c.o,c.c)),cw,Math.max(2,Math.abs(Y(c.o)-Y(c.c))));}x.strokeStyle='#4a90e2';x.beginPath();x.moveTo(0,Y(max-(max-min)*0.35));x.lineTo(w,Y(max-(max-min)*0.35));x.stroke();drawings.forEach(d=>{x.strokeStyle='#ffcc00';x.lineWidth=2;x.fillStyle='rgba(255,204,0,0.15)';if(d.type=='hline'){x.beginPath();x.moveTo(0,d.y1);x.lineTo(w,d.y1);x.stroke();}if(d.type=='line'){x.beginPath();x.moveTo(d.x1,d.y1);x.lineTo(d.x2,d.y2);x.stroke();}if(d.type=='rect'){x.strokeRect(d.x1,d.y1,d.x2-d.x1,d.y2-d.y1);x.fillRect(d.x1,d.y1,d.x2-d.x1,d.y2-d.y1);}if(d.type=='fib'){[0,0.236,0.382,0.5,0.618,0.786,1].forEach(f=>{let y=d.y1+(d.y2-d.y1)*f;x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();});}if(d.type=='text'){x.fillStyle='#ffcc00';x.font='bold 13px Arial';x.fillText(d.text||'BUY',d.x1,d.y1);}});}
+function draw(){const cv=document.getElementById('chart');const x=cv.getContext('2d');let w=cv.offsetWidth,h=300;cv.width=w*2;cv.height=h*2;x.scale(2,2);x.clearRect(0,0,w,h);let all=candles.flatMap(c=>[c.h,c.l]);let max=Math.max(...all),min=Math.min(...all);let Y=v=>20+(max-v)/(max-min)*(h-50);for(let i=0;i<candles.length;i++){let c=candles[i];let px=10+i*((w-30)/candles.length);let cw=(w-30)/candles.length*0.6;x.strokeStyle='#888';x.beginPath();x.moveTo(px+cw/2,Y(c.h));x.lineTo(px+cw/2,Y(c.l));x.stroke();x.fillStyle=c.c>=c.o?'#2ebd85':'#ff4d4d';x.fillRect(px,Y(Math.max(c.o,c.c)),cw,Math.max(2,Math.abs(Y(c.o)-Y(c.c))));}x.strokeStyle='#4a90e2';x.beginPath();x.moveTo(0,Y(max-(max-min)*0.35));x.lineTo(w,Y(max-(max-min)*0.35));x.stroke();x.strokeStyle='#ff4d4d';x.setLineDash([4,4]);x.beginPath();x.moveTo(0,Y(min+(max-min)*0.2));x.lineTo(w,Y(min+(max-min)*0.2));x.stroke();x.setLineDash([]);drawings.forEach(d=>{x.strokeStyle='#ffcc00';x.lineWidth=2;x.fillStyle='rgba(255,204,0,0.15)';if(d.type=='hline'){x.beginPath();x.moveTo(0,d.y1);x.lineTo(w,d.y1);x.stroke();}if(d.type=='line'){x.beginPath();x.moveTo(d.x1,d.y1);x.lineTo(d.x2,d.y2);x.stroke();}if(d.type=='rect'){x.strokeRect(d.x1,d.y1,d.x2-d.x1,d.y2-d.y1);x.fillRect(d.x1,d.y1,d.x2-d.x1,d.y2-d.y1);}if(d.type=='fib'){[0,0.236,0.382,0.5,0.618,0.786,1].forEach(f=>{let y=d.y1+(d.y2-d.y1)*f;x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();});}if(d.type=='text'){x.fillStyle='#ffcc00';x.font='bold 13px Arial';x.fillText(d.text||'BUY',d.x1,d.y1);}});drawCVD();}
+function drawCVD(){const cv=document.getElementById('cvdCanvas');const x=cv.getContext('2d');let w=cv.offsetWidth,h=70;cv.width=w*2;cv.height=h*2;x.scale(2,2);x.clearRect(0,0,w,h);x.fillStyle='#888';x.font='10px Arial';x.fillText('SPOT CVD (Green)  /  PERP CVD (Red)',6,12);if(spotHist.length>1){x.strokeStyle='#2ebd85';x.lineWidth=2;x.beginPath();spotHist.forEach((v,i)=>{let px=i/(spotHist.length-1)*w;let py=20+(2-v)/4*40;if(i==0)x.moveTo(px,py);else x.lineTo(px,py);});x.stroke();x.strokeStyle='#ff4d4d';x.beginPath();perpHist.forEach((v,i)=>{let px=i/(perpHist.length-1)*w;let py=20+(2-(-v))/4*40;if(i==0)x.moveTo(px,py);else x.lineTo(px,py);});x.stroke();}}
 const cv=document.getElementById('chart');function pos(e){let r=cv.getBoundingClientRect();let t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
 cv.addEventListener('touchstart',e=>{if(tool=='cursor')return;start=pos(e);if(tool=='hline'){drawings.push({type:'hline',y1:start.y});draw();}},{passive:true});
 cv.addEventListener('touchend',e=>{if(!start)return;let p=pos(e.changedTouches[0]);if(['line','rect','fib'].includes(tool))drawings.push({type:tool,x1:start.x,y1:start.y,x2:p.x,y2:p.y});if(tool=='text'){let t=prompt('Kya likhna hai?');if(t)drawings.push({type:'text',x1:p.x,y1:p.y,text:t});}start=null;draw();});
-function randTrades(el){let h='';for(let i=0;i<9;i++){let e=ex[Math.floor(Math.random()*ex.length)];let p=(price+(Math.random()*200-100)).toFixed(1);let a=(Math.random()*300+10).toFixed(0);h+=`<div class="row"><span class="dot ${e[1]}">${e[0]}</span><span>${Number(p).toLocaleString()}</span><span class="amt">$${a}K</span></div>`;}document.getElementById(el).innerHTML=h;}
-async function fetchPrice(){try{let r=await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');let j=await r.json();price=parseFloat(j.price);document.getElementById('avgPrice').textContent=price.toLocaleString(undefined,{minimumFractionDigits:1});document.getElementById('priceTag').textContent=price.toFixed(1);}catch(e){}}
-setInterval(()=>{fetchPrice();randTrades('longCol');randTrades('shortCol');randTrades('spotCol');},3000);
-fetchPrice();randTrades('longCol');randTrades('shortCol');randTrades('spotCol');draw();
+function randTrades(el,color){let h='';for(let i=0;i<9;i++){let e=ex[Math.floor(Math.random()*ex.length)];let p=(price+(Math.random()*200-100)).toFixed(1);let a=(Math.random()*300+10).toFixed(0);h+=`<div class="row"><span class="dot ${e[1]}">${e[0]}</span><span style="color:${color}">${Number(p).toLocaleString()}</span><span class="amt">$${a}K</span></div>`;}document.getElementById(el).innerHTML=h;}
+function addRecent(){let e=ex[Math.floor(Math.random()*ex.length)];let side=Math.random()>0.5?'BUY':'SELL';let p=(price+(Math.random()*100-50)).toFixed(1);let a=(Math.random()*100+5).toFixed(1);let div=document.createElement('div');div.className='recRow';div.innerHTML=`<span><span class="dot ${e[1]}" style="display:inline-flex">${e[0]}</span> ${e[1].toUpperCase()}</span><span style="color:${side=='BUY'?'#2ebd85':'#ff4d4d'}">${side} ${Number(p).toLocaleString()}</span><span>$${a}K • Just now</span>`;let list=document.getElementById('recentList');list.prepend(div);while(list.children.length>6)list.removeChild(list.lastChild);}
+async function fetchPrice(){try{let r=await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');let j=await r.json();price=parseFloat(j.price);document.getElementById('avgPrice').textContent=price.toLocaleString(undefined,{minimumFractionDigits:1});document.getElementById('priceTag').textContent=price.toFixed(1);document.getElementById('cP').textContent=price.toFixed(1);}catch(e){}spotCVD+=(Math.random()*0.4-0.2);perpCVD+=(Math.random()*0.4-0.2);spotHist.push(spotCVD);perpHist.push(perpCVD);if(spotHist.length>30){spotHist.shift();perpHist.shift();}document.getElementById('spotCVD').textContent=(spotCVD>=0?'+':'')+spotCVD.toFixed(2);document.getElementById('perpCVD').textContent=(perpCVD>=0?'+':'')+perpCVD.toFixed(2);document.getElementById('vol').textContent=(Math.random()*300-150).toFixed(2)+'M';}
+setInterval(()=>{fetchPrice();randTrades('longCol','#2ebd85');randTrades('shortCol','#ff4d4d');randTrades('buyCol','#2ebd85');randTrades('sellCol','#ff4d4d');addRecent();draw();},3000);
+for(let i=0;i<30;i++){spotCVD+=(Math.random()*0.2-0.1);perpCVD+=(Math.random()*0.2-0.1);spotHist.push(spotCVD);perpHist.push(perpCVD);}
+fetchPrice();randTrades('longCol','#2ebd85');randTrades('shortCol','#ff4d4d');randTrades('buyCol','#2ebd85');randTrades('sellCol','#ff4d4d');addRecent();addRecent();addRecent();draw();
 </script>
 </body>
 </html>
